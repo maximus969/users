@@ -24,3 +24,7 @@ func (s *UsersService) GetAllUsers() ([]users.User, error) {
 func (s *UsersService) GetUser(id string) (users.User, error) {
 	return s.repo.GetUser(id)
 }
+
+func (s *UsersService) DeleteUser(id string) error {
+	return s.repo.DeleteUser(id)
+}

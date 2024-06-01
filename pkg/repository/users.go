@@ -57,3 +57,11 @@ func (r *UsersPostgres) GetUser(id string) (users.User, error) {
 
 	return user, err
 }
+
+func (r *UsersPostgres) DeleteUser(id string) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1",
+		usersTable)
+	_, err := r.db.Exec(query, id)
+
+	return err
+}
