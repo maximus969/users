@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/google/uuid"
@@ -58,10 +59,61 @@ func (r *UsersPostgres) GetUser(id string) (users.User, error) {
 	return user, err
 }
 
+func (r *UsersPostgres) UpdateUser(id string, updatedUser users.UserUpdate) error {
+	userUpdates := StructToMap(updatedUser)
+
+	delete(userUpdates, "id")
+	delete(userUpdates, "created")
+
+	if len(userUpdates) == 0 {
+		return nil
+	}
+
+	query := `UPDATE users SET `
+
+	args := []interface{}{}
+	i := 1
+	for key, value := range userUpdates {
+		query += fmt.Sprintf("%s = $%d, ", key, i)
+		args = append(args, value)
+		i++
+	}
+
+	query = query[:len(query)-2] // Remove the trailing comma and space
+	query += fmt.Sprintf(" WHERE id = $%d", i)
+
+	fmt.Println(query)
+	fmt.Println(args)
+	args = append(args, id)
+
+	_, err := r.db.Exec(query, args...)
+
+	return err
+}
+
 func (r *UsersPostgres) DeleteUser(id string) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1",
 		usersTable)
 	_, err := r.db.Exec(query, id)
 
 	return err
+}
+
+func StructToMap(obj interface{}) map[string]interface{} {
+	result := make(map[string]interface{})
+	objValue := reflect.ValueOf(obj)
+	objType := reflect.TypeOf(obj)
+
+	for i := 0; i < objType.NumField(); i++ {
+		field := objType.Field(i)
+		fieldValue := objValue.Field(i)
+
+		fieldName := field.Name
+
+		if !fieldValue.IsNil() {
+			result[fieldName] = fieldValue.Elem().Interface()
+		}
+	}
+
+	return result
 }

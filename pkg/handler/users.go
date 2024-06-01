@@ -56,7 +56,20 @@ func (h *Handler) getUser(c *gin.Context) {
 }
 
 func (h *Handler) updateUser(c *gin.Context) {
-	//
+	id := c.Param("id")	
+
+	var input users.UserUpdate
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.services.Users.UpdateUser(id, input); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, statusResponse{"ok"})
 }
 
 func (h *Handler) deleteUser(c *gin.Context) {

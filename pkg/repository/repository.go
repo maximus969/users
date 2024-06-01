@@ -9,6 +9,7 @@ type Users interface {
 	Create(newUser users.User) error
 	GetAllUsers() ([]users.User, error)
 	GetUser(id string) (users.User, error)
+	UpdateUser(id string, updatedUser users.UserUpdate) error
 	DeleteUser(id string) error
 }
 

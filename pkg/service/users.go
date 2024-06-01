@@ -25,6 +25,10 @@ func (s *UsersService) GetUser(id string) (users.User, error) {
 	return s.repo.GetUser(id)
 }
 
+func (s *UsersService) UpdateUser(id string, updatedUser users.UserUpdate) error {
+	return s.repo.UpdateUser(id, updatedUser)
+}
+
 func (s *UsersService) DeleteUser(id string) error {
 	return s.repo.DeleteUser(id)
 }
