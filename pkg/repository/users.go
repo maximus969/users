@@ -36,3 +36,13 @@ func (r *UsersPostgres) Create(user users.User) error {
 	
 	return nil
 }
+
+func (r *UsersPostgres) GetAllUsers() ([]users.User, error) {
+	var allUsers []users.User
+
+	query := fmt.Sprintf(`SELECT * FROM %s`, usersTable)
+
+	err := r.db.Select(&allUsers, query)
+
+	return allUsers, err
+}
