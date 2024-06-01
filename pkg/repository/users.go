@@ -81,9 +81,7 @@ func (r *UsersPostgres) UpdateUser(id string, updatedUser users.UserUpdate) erro
 
 	query = query[:len(query)-2] // Remove the trailing comma and space
 	query += fmt.Sprintf(" WHERE id = $%d", i)
-
-	fmt.Println(query)
-	fmt.Println(args)
+	
 	args = append(args, id)
 
 	_, err := r.db.Exec(query, args...)
