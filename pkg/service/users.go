@@ -20,3 +20,7 @@ func (s *UsersService) Create(newUser users.User) error {
 func (s *UsersService) GetAllUsers() ([]users.User, error) {
 	return s.repo.GetAllUsers()
 }
+
+func (s *UsersService) GetUser(id string) (users.User, error) {
+	return s.repo.GetUser(id)
+}

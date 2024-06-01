@@ -1,6 +1,6 @@
 package service
 
-import (
+import (	
 	"github.com/maximus969/users-app"
 	"github.com/maximus969/users-app/pkg/repository"
 )
@@ -8,6 +8,7 @@ import (
 type Users interface {
 	Create(newUser users.User) error
 	GetAllUsers() ([]users.User, error)
+	GetUser(id string) (users.User, error)
 }
 
 type Service struct {

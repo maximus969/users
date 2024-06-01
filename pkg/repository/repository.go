@@ -8,6 +8,7 @@ import (
 type Users interface {
 	Create(newUser users.User) error
 	GetAllUsers() ([]users.User, error)
+	GetUser(id string) (users.User, error)
 }
 
 type Repository struct {

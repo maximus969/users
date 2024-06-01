@@ -46,3 +46,14 @@ func (r *UsersPostgres) GetAllUsers() ([]users.User, error) {
 
 	return allUsers, err
 }
+
+func (r *UsersPostgres) GetUser(id string) (users.User, error) {
+	var user users.User
+
+	query := fmt.Sprintf(`SELECT * FROM %s WHERE id = $1`,
+		usersTable)
+
+	err := r.db.Get(&user, query, id)
+
+	return user, err
+}
