@@ -4,3 +4,13 @@
 
 .database
 .DS_Store
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+*.out
+
+go.work
