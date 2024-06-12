@@ -27,16 +27,10 @@ func (r UserRepo) CreateUser(ctx context.Context, user domain.User) (domain.User
 	dbUser := domainToUser(user)
 
 	newId := uuid.New()
-	created := time.Now()
-
-	fmt.Println("new id: ", newId)
-	fmt.Println("created: ", created)
+	created := time.Now()	
 
 	dbUser.Id = newId
-	dbUser.Created = created
-
-	fmt.Printf("user: %+v\n", user)
-	fmt.Printf("dbUser: %+v\n", dbUser)
+	dbUser.Created = created	
 
 	var insertedUser models.User
 	err := r.db.NewInsert().Model(&dbUser).Returning("*").Scan(ctx, &insertedUser)

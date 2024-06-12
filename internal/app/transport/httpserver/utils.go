@@ -11,6 +11,7 @@ func toResponseUser(user domain.User) UserResponse {
 		Lastname:  user.Lastname(),
 		Age:       user.Age(),
 		Email:     user.Email(),
+		Created:   user.Created(),
 	}
 }
 
