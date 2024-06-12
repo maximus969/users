@@ -1,8 +1,27 @@
+.PHONY: dc run test lint
+
+dc:
+	docker-compose up  --remove-orphans --build
+
 build:
-	docker-compose build users-app
+	go build -race -o app cmd/main.go
 
 run:
-	docker-compose up users-app
+	go build -race -o app cmd/main.go && \
+	HTTP_ADDR=:8080 \
+	DEBUG_ERRORS=1 \
+	DSN="postgres://postgres:@127.0.0.1:5432/bookshop?sslmode=disable" \
+	MIGRATIONS_PATH="file://./internal/app/migrations" \
+	./app
 
-migrate:
-	migrate -path ./schema -database 'postgres://postgres:postgres@0.0.0.0:5436/postgres?sslmode=disable' up
+test:
+	go test -race ./...
+
+install-lint:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
+
+lint:
+	golangci-lint run ./...
+
+generate:
+	go generate ./...
