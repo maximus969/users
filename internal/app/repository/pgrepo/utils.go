@@ -12,6 +12,7 @@ func domainToUser(user domain.User) models.User {
 		Lastname:  user.Lastname(),
 		Email:     user.Email(),
 		Age:       user.Age(),
+		Created:   user.Created(),
 	}
 }
 
@@ -22,5 +23,6 @@ func userToDomain(user models.User) (domain.User, error) {
 		Lastname:  user.Lastname,
 		Email:     user.Email,
 		Age:       user.Age,
+		Created:   user.Created,
 	})
 }

@@ -21,7 +21,8 @@ type NewUserData struct {
 	Firstname string   
 	Lastname  string   
 	Email     string   
-	Age       uint	
+	Age       uint
+	Created   time.Time
 }
 
 // NewUser creates a new user.
@@ -31,7 +32,8 @@ func NewUser(data NewUserData) (User, error) {
 		firstname: data.Firstname,
 		lastname: data.Lastname,
 		email:    data.Email,
-		age:    data.Age,		
+		age:    data.Age,
+		created:    data.Created,
 	}, nil
 }
 
@@ -40,22 +42,27 @@ func (u User) Id() uuid.UUID {
 	return u.id
 }
 
-// Username returns the user firstname.
+// Firstname returns the user firstname.
 func (u User) Firstname() string {
 	return u.firstname
 }
 
-// Password returns the user lastname.
+// Lastname returns the user lastname.
 func (u User) Lastname() string {
 	return u.lastname
 }
 
-// Password returns the user email.
+// Email returns the user email.
 func (u User) Email() string {
 	return u.email
 }
 
-// Password returns the user age.
+// Age returns the user age.
 func (u User) Age() uint {
 	return u.age
+}
+
+// Created returns the user firstname.
+func (u User) Created() time.Time {
+	return u.created
 }
