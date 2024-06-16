@@ -1,0 +1,9 @@
+with-expecter: true
+dir: 'mocks'
+outpkg: 'mocks'
+mockname: '{{.InterfaceNameCamel}}'
+filename: '{{.InterfaceNameSnake}}_mock.go'
+packages:
+    github.com/maximus969/users-app/internal/app/transport/httpserver:
+        interfaces:
+            UserService:
