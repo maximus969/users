@@ -2,7 +2,7 @@ package config
 
 import "os"
 
-// Config is a config :).
+// Config is a config
 type Config struct {
 	HTTPAddr       string
 	DSN            string
