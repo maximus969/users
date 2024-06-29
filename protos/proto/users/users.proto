@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "users.v1;usersv1";
+
+import "google/protobuf/timestamp.proto";
+
+
+service Users {
+  rpc GetUserById (GetUserByIdRequest) returns (UserResponse);
+  rpc GetUsers (GetUsersRequest) returns (UsersResponse);
+  rpc CreateUser (UserRequest) returns (UserResponse);
+  rpc UpdateUser (UserRequest) returns (UserResponse);
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+}
+
+message GetUserByIdRequest {
+  string id = 1;
+};
+
+message UserRequest {
+  string id = 1;
+	string firstname = 2;
+	string lastname = 3;
+	string email = 4;
+	int64 age = 5;
+	google.protobuf.Timestamp created = 6;
+};
+
+message UserResponse {
+  string id = 1;
+	string firstname = 2;
+	string lastname = 3;
+	string email = 4;
+	int64 age = 5;
+	google.protobuf.Timestamp created = 6;
+};
+
+message GetUsersRequest {}
+
+message UsersResponse {
+  repeated UserResponse users = 1;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+};
+
+message DeleteUserResponse {};
+

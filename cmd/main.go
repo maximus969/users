@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,10 +16,12 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
 
 	"github.com/maximus969/users-app/internal/app/config"
 	"github.com/maximus969/users-app/internal/app/repository/pgrepo"
 	"github.com/maximus969/users-app/internal/app/services"
+	"github.com/maximus969/users-app/internal/app/transport/grpcserver"
 	"github.com/maximus969/users-app/internal/app/transport/httpserver"
 	"github.com/maximus969/users-app/internal/pkg/pg"
 )
@@ -29,8 +32,6 @@ func main() {
 	}
 	os.Exit(0)
 }
-
-const tokenTTL = time.Minute * 5
 
 func run() error {
 	// read config from env
@@ -51,13 +52,10 @@ func run() error {
 
 	// create repositories
 	userRepo := pgrepo.NewUserRepo(pgDB)
-
 	userService := services.NewUserService(userRepo)
 
-	// create http server with application injected
+	// HTTP server setup
 	httpServer := httpserver.NewHttpServer(userService)
-
-	// create http router
 	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Users app"))
@@ -74,30 +72,51 @@ func run() error {
 		Handler: router,
 	}
 
-	// listen to OS signals and gracefully shutdown HTTP server
-	stopped := make(chan struct{})
+	grpcListener, err := net.Listen("tcp", cfg.GRPCAddr)
+	if err != nil {
+		return fmt.Errorf("failed to start grpc listener: %w", err)
+	}
+	var opts []grpc.ServerOption
+	grpcServer := grpc.NewServer(opts...)
+	grpcserver.RegisterGRPCServer(grpcServer, &userService)
+
+	errChan := make(chan error, 2)
+
 	go func() {
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-		<-sigint
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(ctx); err != nil {
-			log.Printf("HTTP Server Shutdown Error: %v", err)
+		log.Printf("Starting HTTP server on %s", cfg.HTTPAddr)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errChan <- fmt.Errorf("HTTP server ListenAndServe Error: %v", err)
 		}
-		close(stopped)
 	}()
 
-	log.Printf("Starting HTTP server on %s", cfg.HTTPAddr)
+	go func() {
+		log.Printf("Starting gRPC server on %s", cfg.GRPCAddr)
+		if err := grpcServer.Serve(grpcListener); err != nil {
+			errChan <- fmt.Errorf("failed to serve gRPC server: %v", err)
+		}
+	}()
 
-	// start HTTP server
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		log.Fatalf("HTTP server ListenAndServe Error: %v", err)
+	// Handle graceful shutdown
+	sigint := make(chan os.Signal, 1)
+	signal.Notify(sigint, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	select {
+	case <-sigint:
+		log.Println("Shutting down servers...")
+	case err := <-errChan:
+		return err
 	}
 
-	<-stopped
+	// Gracefully stop HTTP server
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Printf("HTTP Server Shutdown Error: %v", err)
+	}
 
-	log.Printf("Have a nice day!")
+	// Gracefully stop gRPC server
+	grpcServer.GracefulStop()
+
+	log.Println("Servers gracefully stopped")
 
 	return nil
 }

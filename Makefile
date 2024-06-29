@@ -9,6 +9,7 @@ build:
 run:
 	go build -race -o app cmd/main.go && \
 	HTTP_ADDR=:8080 \
+	GRPC_ADDR=:9000 \
 	DEBUG_ERRORS=1 \
 	DSN="postgres://postgres:@127.0.0.1:5432/bookshop?sslmode=disable" \
 	MIGRATIONS_PATH="file://./internal/app/migrations" \

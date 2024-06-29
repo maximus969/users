@@ -8,19 +8,19 @@ import (
 
 // User is a domain User.
 type User struct {
-	id        uuid.UUID 
-	firstname string    
-	lastname  string    
-	email     string    
+	id        uuid.UUID
+	firstname string
+	lastname  string
+	email     string
 	age       uint
 	created   time.Time
 }
 
 type NewUserData struct {
 	Id        uuid.UUID
-	Firstname string   
-	Lastname  string   
-	Email     string   
+	Firstname string
+	Lastname  string
+	Email     string
 	Age       uint
 	Created   time.Time
 }
@@ -28,12 +28,12 @@ type NewUserData struct {
 // NewUser creates a new user.
 func NewUser(data NewUserData) (User, error) {
 	return User{
-		id:       data.Id,
+		id:        data.Id,
 		firstname: data.Firstname,
-		lastname: data.Lastname,
-		email:    data.Email,
-		age:    data.Age,
-		created:    data.Created,
+		lastname:  data.Lastname,
+		email:     data.Email,
+		age:       data.Age,
+		created:   data.Created,
 	}, nil
 }
 

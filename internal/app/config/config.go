@@ -5,6 +5,7 @@ import "os"
 // Config is a config
 type Config struct {
 	HTTPAddr       string
+	GRPCAddr       string
 	DSN            string
 	MigrationsPath string
 }
@@ -15,6 +16,10 @@ func Read() Config {
 	httpAddr, exists := os.LookupEnv("HTTP_ADDR")
 	if exists {
 		config.HTTPAddr = httpAddr
+	}
+	grpcAddr, exists := os.LookupEnv("GRPC_ADDR")
+	if exists {
+		config.GRPCAddr = grpcAddr
 	}
 	dsn, exists := os.LookupEnv("DSN")
 	if exists {

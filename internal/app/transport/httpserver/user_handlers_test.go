@@ -51,7 +51,7 @@ func TestHttpServer_GetUser(t *testing.T) {
 	defer res.Body.Close()
 
 	require.Equal(t, http.StatusOK, res.StatusCode)
-	
+
 	var createUserResponse UserResponse
 	err = json.NewDecoder(res.Body).Decode(&createUserResponse)
 	require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestHttpServer_GetUser(t *testing.T) {
 
 func TestHttpServer_DeleteUser(t *testing.T) {
 	userServiceMock := mocks.NewUserService(t)
-	
+
 	testUUID := uuid.MustParse("b123991c-a5b5-413f-8f78-070d2ae5f481")
 
 	userServiceMock.On("GetUserById", mock.Anything, testUUID).Return(domain.User{}, nil)
@@ -83,7 +83,7 @@ func TestHttpServer_DeleteUser(t *testing.T) {
 
 	res := w.Result()
 	defer res.Body.Close()
-	
+
 	require.Equal(t, http.StatusOK, res.StatusCode)
 
 	var deleteResponse map[string]bool
@@ -92,4 +92,3 @@ func TestHttpServer_DeleteUser(t *testing.T) {
 
 	require.Equal(t, true, deleteResponse["deleted"])
 }
-
